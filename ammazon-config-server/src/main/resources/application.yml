@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: ammazon-config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/myllm135795-eng/Ammazon-enterprise-ecommerce-platform.git
+          search-paths: config-repo
+          clone-on-start: true
+          default-label: main
+
+server:
+  port: 8888
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+  endpoint:
+    health:
+      show-details: always
