@@ -1,0 +1,36 @@
+package com.ammazon.shared.filter;
+
+import com.ammazon.shared.util.CorrelationIdUtil;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Filter for adding correlation ID to all requests.
+ */
+@Component
+public class CorrelationIdFilter extends OncePerRequestFilter {
+    private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
+        if (correlationId == null || correlationId.isEmpty()) {
+            correlationId = CorrelationIdUtil.generateCorrelationId();
+        }
+        CorrelationIdUtil.setCorrelationId(correlationId);
+        response.addHeader(CORRELATION_ID_HEADER, correlationId);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            CorrelationIdUtil.clear();
+        }
+    }
+}
