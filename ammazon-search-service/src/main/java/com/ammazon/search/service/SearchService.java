@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Search service with Elasticsearch integration.
+ * Search service for full-text search operations.
  */
 @Slf4j
 @Service
@@ -20,11 +20,11 @@ public class SearchService {
     private ProductSearchRepository productSearchRepository;
 
     /**
-     * Search products by name or description.
+     * Search products by name.
      */
-    public List<ProductSearchDocument> search(String query) {
-        log.info("Searching products with query: {}", query);
-        return productSearchRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    public List<ProductSearchDocument> searchByName(String query) {
+        log.info("Searching products by name: {}", query);
+        return productSearchRepository.findByNameContainingIgnoreCase(query);
     }
 
     /**
@@ -36,27 +36,27 @@ public class SearchService {
     }
 
     /**
-     * Index product in Elasticsearch.
+     * Get all active products for search.
      */
-    public void indexProduct(ProductSearchDocument document) {
+    public List<ProductSearchDocument> getActiveProducts() {
+        log.info("Getting all active products for search");
+        return productSearchRepository.findByActiveTrue();
+    }
+
+    /**
+     * Index product document.
+     */
+    public ProductSearchDocument indexProduct(ProductSearchDocument document) {
         log.info("Indexing product: {}", document.getId());
-        productSearchRepository.save(document);
+        return productSearchRepository.save(document);
     }
 
     /**
-     * Listen to product events and update Elasticsearch index.
+     * Listen to product events and index them.
      */
-    @KafkaListener(topics = "product-events", groupId = "search-service")
-    public void handleProductEvent(String event) {
-        log.info("Processing product event: {}", event);
-        // Parse event and update Elasticsearch index
-    }
-
-    /**
-     * Delete product from index.
-     */
-    public void deleteProduct(String productId) {
-        log.info("Deleting product from index: {}", productId);
-        productSearchRepository.deleteById(productId);
+    @KafkaListener(topics = "product-indexed", groupId = "search-service")
+    public void handleProductIndexing(ProductSearchDocument document) {
+        log.info("Received product indexing event: {}", document.getId());
+        indexProduct(document);
     }
 }

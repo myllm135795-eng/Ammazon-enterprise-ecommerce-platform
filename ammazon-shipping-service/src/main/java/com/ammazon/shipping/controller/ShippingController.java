@@ -27,31 +27,42 @@ public class ShippingController {
     @PostMapping
     public ResponseEntity<ApiResponse<Shipment>> createShipment(
             @RequestParam String orderId,
-            @RequestParam String carrier,
             @RequestParam String shippingAddress) {
         log.info("Create shipment endpoint called for orderId: {}", orderId);
-        Shipment shipment = shippingService.createShipment(orderId, carrier, shippingAddress);
+        Shipment shipment = shippingService.createShipment(orderId, shippingAddress);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(shipment));
     }
 
     /**
-     * Track shipment.
+     * Track shipment by order ID.
      */
-    @GetMapping("/track/{trackingNumber}")
-    public ResponseEntity<ApiResponse<Shipment>> trackShipment(@PathVariable String trackingNumber) {
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<ApiResponse<Shipment>> trackByOrderId(@PathVariable String orderId) {
+        log.info("Track shipment endpoint called for orderId: {}", orderId);
+        Shipment shipment = shippingService.getShipmentByOrderId(orderId);
+        return ResponseEntity.ok(ApiResponse.ok(shipment));
+    }
+
+    /**
+     * Track shipment by tracking number.
+     */
+    @GetMapping("/{trackingNumber}")
+    public ResponseEntity<ApiResponse<Shipment>> trackByNumber(@PathVariable String trackingNumber) {
         log.info("Track shipment endpoint called for trackingNumber: {}", trackingNumber);
         Shipment shipment = shippingService.trackShipment(trackingNumber);
         return ResponseEntity.ok(ApiResponse.ok(shipment));
     }
 
     /**
-     * Get shipment by order ID.
+     * Update shipment status.
      */
-    @GetMapping("/order/{orderId}")
-    public ResponseEntity<ApiResponse<Shipment>> getShipmentByOrderId(@PathVariable String orderId) {
-        log.info("Get shipment endpoint called for orderId: {}", orderId);
-        Shipment shipment = shippingService.getShipmentByOrderId(orderId);
-        return ResponseEntity.ok(ApiResponse.ok(shipment));
+    @PutMapping("/{shipmentId}/status")
+    public ResponseEntity<ApiResponse<Shipment>> updateStatus(
+            @PathVariable String shipmentId,
+            @RequestParam String status) {
+        log.info("Update shipment status endpoint called for shipmentId: {}", shipmentId);
+        Shipment updated = shippingService.updateShipmentStatus(shipmentId, status);
+        return ResponseEntity.ok(ApiResponse.ok(updated));
     }
 
     /**

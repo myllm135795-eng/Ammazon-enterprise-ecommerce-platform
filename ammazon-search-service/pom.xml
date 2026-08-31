@@ -13,7 +13,7 @@
 
     <artifactId>ammazon-search-service</artifactId>
     <name>Ammazon Search Service</name>
-    <description>Search Service using Elasticsearch with Full-Text Search Capabilities</description>
+    <description>Full-Text Search Service using Elasticsearch</description>
 
     <dependencies>
         <dependency>

@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * Shipping Service Application.
- * Manages shipping and logistics with third-party carrier integration.
+ * Handles shipping, logistics, and third-party carrier integration.
  */
 @SpringBootApplication
 @EnableDiscoveryClient

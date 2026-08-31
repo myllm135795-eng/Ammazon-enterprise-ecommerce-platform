@@ -13,7 +13,7 @@
 
     <artifactId>ammazon-shipping-service</artifactId>
     <name>Ammazon Shipping Service</name>
-    <description>Shipping and Logistics Service with Third-party Integration</description>
+    <description>Shipping and Logistics Service with Third-Party Integration</description>
 
     <dependencies>
         <dependency>

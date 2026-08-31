@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,14 +22,12 @@ public class AnalyticsController {
     private AnalyticsService analyticsService;
 
     /**
-     * Get dashboard metrics.
+     * Get order metrics.
      */
-    @GetMapping("/dashboard")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboard() {
-        log.info("Dashboard endpoint called");
-        Map<String, Object> metrics = new HashMap<>();
-        metrics.put("totalOrders", analyticsService.getTotalOrders());
-        metrics.put("totalRevenue", analyticsService.getTotalRevenue());
+    @GetMapping("/orders")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getOrderMetrics() {
+        log.info("Get order metrics endpoint called");
+        Map<String, Object> metrics = analyticsService.getOrderMetrics();
         return ResponseEntity.ok(ApiResponse.ok(metrics));
     }
 

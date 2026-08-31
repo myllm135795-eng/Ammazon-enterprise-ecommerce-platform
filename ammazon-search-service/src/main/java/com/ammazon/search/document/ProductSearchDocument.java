@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.math.BigDecimal;
 
 /**
- * Elasticsearch document for product search.
+ * Product search document for Elasticsearch.
  */
 @Document(indexName = "products")
 @Data
@@ -23,23 +23,20 @@ public class ProductSearchDocument {
     @Id
     private String id;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String name;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String description;
 
     @Field(type = FieldType.Keyword)
     private String category;
 
-    @Field(type = FieldType.Scaled_Float)
+    @Field(type = FieldType.Double)
     private BigDecimal price;
 
     @Field(type = FieldType.Keyword)
-    private String imageUrl;
-
-    @Field(type = FieldType.Integer)
-    private int stockQuantity;
+    private String brand;
 
     @Field(type = FieldType.Double)
     private double rating;
@@ -48,5 +45,8 @@ public class ProductSearchDocument {
     private int reviewCount;
 
     @Field(type = FieldType.Keyword)
+    private String imageUrl;
+
+    @Field(type = FieldType.Boolean)
     private boolean active;
 }

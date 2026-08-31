@@ -23,17 +23,17 @@ public class SearchController {
     private SearchService searchService;
 
     /**
-     * Full-text search.
+     * Search products by query.
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProductSearchDocument>>> search(@RequestParam String q) {
         log.info("Search endpoint called with query: {}", q);
-        List<ProductSearchDocument> results = searchService.search(q);
+        List<ProductSearchDocument> results = searchService.searchByName(q);
         return ResponseEntity.ok(ApiResponse.ok(results));
     }
 
     /**
-     * Search by category.
+     * Search products by category.
      */
     @GetMapping("/category/{category}")
     public ResponseEntity<ApiResponse<List<ProductSearchDocument>>> searchByCategory(@PathVariable String category) {

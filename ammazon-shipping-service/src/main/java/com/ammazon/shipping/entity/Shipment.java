@@ -1,6 +1,5 @@
 package com.ammazon.shipping.entity;
 
-import com.ammazon.commons.enums.ShippingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Shipment entity.
+ * Shipment entity for tracking orders.
  */
 @Entity
 @Table(name = "shipments")
@@ -27,20 +26,14 @@ public class Shipment {
     private String orderId;
 
     @Column(nullable = false)
-    private String carrier;
-
-    @Column(unique = true)
     private String trackingNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ShippingStatus status;
-
-    @Column(nullable = false)
+    private String carrier; // FedEx, UPS, DHL, etc.
+    private String status;  // PENDING, SHIPPED, IN_TRANSIT, DELIVERED
     private String shippingAddress;
-
-    private String estimatedDelivery;
-    private String actualDelivery;
+    private LocalDateTime shipDate;
+    private LocalDateTime estimatedDelivery;
+    private LocalDateTime deliveryDate;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -52,7 +45,7 @@ public class Shipment {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.status = ShippingStatus.PENDING;
+        this.status = "PENDING";
     }
 
     @PreUpdate
