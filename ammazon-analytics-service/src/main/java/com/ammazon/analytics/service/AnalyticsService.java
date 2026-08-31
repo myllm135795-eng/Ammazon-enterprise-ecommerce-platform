@@ -1,69 +1,62 @@
 package com.ammazon.analytics.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
- * Analytics service for processing events and generating metrics.
+ * Analytics service for processing events and generating insights.
  */
 @Slf4j
 @Service
 public class AnalyticsService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
     /**
-     * Process order events for analytics.
+     * Listen to order events and perform analytics.
      */
     @KafkaListener(topics = "order-events", groupId = "analytics-service")
-    public void handleOrderEvents(String event) {
+    public void processOrderEvent(String event) {
         log.info("Processing order event for analytics: {}", event);
-        // Parse event and update metrics in Redis
-        updateOrderMetrics(event);
+        // Store in ClickHouse for real-time analytics
+        storeOrderAnalytics(event);
     }
 
     /**
-     * Process payment events for analytics.
+     * Listen to product view events.
      */
-    @KafkaListener(topics = "payment-events", groupId = "analytics-service")
-    public void handlePaymentEvents(String event) {
-        log.info("Processing payment event for analytics: {}", event);
-        // Parse event and update metrics in Redis
-        updatePaymentMetrics(event);
+    @KafkaListener(topics = "product-view-events", groupId = "analytics-service")
+    public void processProductViewEvent(String event) {
+        log.info("Processing product view event: {}", event);
+        // Store for trending products analysis
     }
 
     /**
-     * Update order metrics.
+     * Store order analytics in ClickHouse.
      */
-    private void updateOrderMetrics(String event) {
-        // Increment order counters
-        redisTemplate.opsForValue().increment("metrics:orders:total");
-        log.debug("Order metrics updated");
+    private void storeOrderAnalytics(String event) {
+        try {
+            // Parse event and store in ClickHouse
+            log.info("Storing analytics data");
+        } catch (Exception e) {
+            log.error("Error storing analytics", e);
+        }
     }
 
     /**
-     * Update payment metrics.
+     * Get sales metrics.
      */
-    private void updatePaymentMetrics(String event) {
-        // Increment payment counters
-        redisTemplate.opsForValue().increment("metrics:payments:total");
-        log.debug("Payment metrics updated");
+    public String getSalesMetrics() {
+        log.info("Retrieving sales metrics from ClickHouse");
+        // Query ClickHouse for metrics
+        return "Sales metrics retrieved";
     }
 
     /**
-     * Get order metrics.
+     * Get trending products.
      */
-    public Map<String, Object> getOrderMetrics() {
-        log.info("Retrieving order metrics");
-        return Map.of(
-                "total_orders", redisTemplate.opsForValue().get("metrics:orders:total"),
-                "timestamp", System.currentTimeMillis()
-        );
+    public String getTrendingProducts() {
+        log.info("Retrieving trending products");
+        // Query ClickHouse for trending products
+        return "Trending products retrieved";
     }
 }

@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 /**
  * Analytics API controller.
  */
@@ -22,13 +20,23 @@ public class AnalyticsController {
     private AnalyticsService analyticsService;
 
     /**
-     * Get order metrics.
+     * Get sales metrics.
      */
-    @GetMapping("/orders")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getOrderMetrics() {
-        log.info("Get order metrics endpoint called");
-        Map<String, Object> metrics = analyticsService.getOrderMetrics();
+    @GetMapping("/sales-metrics")
+    public ResponseEntity<ApiResponse<String>> getSalesMetrics() {
+        log.info("Get sales metrics endpoint called");
+        String metrics = analyticsService.getSalesMetrics();
         return ResponseEntity.ok(ApiResponse.ok(metrics));
+    }
+
+    /**
+     * Get trending products.
+     */
+    @GetMapping("/trending-products")
+    public ResponseEntity<ApiResponse<String>> getTrendingProducts() {
+        log.info("Get trending products endpoint called");
+        String trending = analyticsService.getTrendingProducts();
+        return ResponseEntity.ok(ApiResponse.ok(trending));
     }
 
     /**

@@ -3,13 +3,6 @@ spring:
     name: ammazon-search-service
   elasticsearch:
     uris: http://localhost:9200
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: search-service
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
   cloud:
     discovery:
       enabled: true

@@ -1,14 +1,14 @@
 package com.ammazon.search.controller;
 
-import com.ammazon.search.document.ProductSearchDocument;
 import com.ammazon.search.service.SearchService;
 import com.ammazon.shared.dto.ApiResponse;
+import com.ammazon.shared.dto.SearchResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Search API controller.
@@ -23,12 +23,16 @@ public class SearchController {
     private SearchService searchService;
 
     /**
-     * Search products by query.
+     * Search products by name.
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductSearchDocument>>> search(@RequestParam String q) {
-        log.info("Search endpoint called with query: {}", q);
-        List<ProductSearchDocument> results = searchService.searchByName(q);
+    public ResponseEntity<ApiResponse<SearchResultDto>> search(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        log.info("Search endpoint called with query: {}", query);
+        Pageable pageable = PageRequest.of(page, size);
+        SearchResultDto results = searchService.searchByName(query, pageable);
         return ResponseEntity.ok(ApiResponse.ok(results));
     }
 
@@ -36,9 +40,13 @@ public class SearchController {
      * Search products by category.
      */
     @GetMapping("/category/{category}")
-    public ResponseEntity<ApiResponse<List<ProductSearchDocument>>> searchByCategory(@PathVariable String category) {
+    public ResponseEntity<ApiResponse<SearchResultDto>> searchByCategory(
+            @PathVariable String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
         log.info("Search by category endpoint called: {}", category);
-        List<ProductSearchDocument> results = searchService.searchByCategory(category);
+        Pageable pageable = PageRequest.of(page, size);
+        SearchResultDto results = searchService.searchByCategory(category, pageable);
         return ResponseEntity.ok(ApiResponse.ok(results));
     }
 

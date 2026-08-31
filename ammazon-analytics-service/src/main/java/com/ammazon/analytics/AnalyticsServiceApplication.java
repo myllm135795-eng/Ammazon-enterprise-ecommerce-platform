@@ -3,14 +3,15 @@ package com.ammazon.analytics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.kafka.annotation.EnableKafka;
 
 /**
  * Analytics Service Application.
- * Processes events using Kafka Streams for analytics and reporting.
+ * Real-time analytics and reporting using ClickHouse.
  */
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableKafka
 public class AnalyticsServiceApplication {
 
     public static void main(String[] args) {

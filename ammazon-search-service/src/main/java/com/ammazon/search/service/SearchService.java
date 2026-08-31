@@ -1,16 +1,19 @@
 package com.ammazon.search.service;
 
-import com.ammazon.search.document.ProductSearchDocument;
+import com.ammazon.search.document.ProductDocument;
 import com.ammazon.search.repository.ProductSearchRepository;
+import com.ammazon.shared.dto.SearchResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Search service for full-text search operations.
+ * Search service for Elasticsearch operations.
  */
 @Slf4j
 @Service
@@ -22,41 +25,76 @@ public class SearchService {
     /**
      * Search products by name.
      */
-    public List<ProductSearchDocument> searchByName(String query) {
+    public SearchResultDto searchByName(String query, Pageable pageable) {
         log.info("Searching products by name: {}", query);
-        return productSearchRepository.findByNameContainingIgnoreCase(query);
+        Page<ProductDocument> results = productSearchRepository.findByNameContainingIgnoreCase(query, pageable);
+        return buildSearchResult(results);
     }
 
     /**
      * Search products by category.
      */
-    public List<ProductSearchDocument> searchByCategory(String category) {
+    public SearchResultDto searchByCategory(String category, Pageable pageable) {
         log.info("Searching products by category: {}", category);
-        return productSearchRepository.findByCategory(category);
+        Page<ProductDocument> results = productSearchRepository.findByCategory(category, pageable);
+        return buildSearchResult(results);
     }
 
     /**
-     * Get all active products for search.
+     * Get all active products.
      */
-    public List<ProductSearchDocument> getActiveProducts() {
-        log.info("Getting all active products for search");
-        return productSearchRepository.findByActiveTrue();
+    public SearchResultDto getActiveProducts(Pageable pageable) {
+        log.info("Getting all active products");
+        Page<ProductDocument> results = productSearchRepository.findByActiveTrue(pageable);
+        return buildSearchResult(results);
     }
 
     /**
      * Index product document.
      */
-    public ProductSearchDocument indexProduct(ProductSearchDocument document) {
+    public ProductDocument indexProduct(ProductDocument document) {
         log.info("Indexing product: {}", document.getId());
         return productSearchRepository.save(document);
     }
 
     /**
-     * Listen to product events and index them.
+     * Delete product from index.
      */
-    @KafkaListener(topics = "product-indexed", groupId = "search-service")
-    public void handleProductIndexing(ProductSearchDocument document) {
-        log.info("Received product indexing event: {}", document.getId());
-        indexProduct(document);
+    public void deleteProductIndex(String productId) {
+        log.info("Deleting product from index: {}", productId);
+        productSearchRepository.deleteById(productId);
+    }
+
+    /**
+     * Build search result from Page.
+     */
+    private SearchResultDto buildSearchResult(Page<ProductDocument> page) {
+        return SearchResultDto.builder()
+                .content(page.getContent().stream()
+                        .map(this::mapToSearchResult)
+                        .collect(Collectors.toList()))
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .isLast(page.isLast())
+                .build();
+    }
+
+    /**
+     * Map ProductDocument to search result DTO.
+     */
+    private SearchResultDto.ProductResult mapToSearchResult(ProductDocument doc) {
+        return SearchResultDto.ProductResult.builder()
+                .id(doc.getId())
+                .name(doc.getName())
+                .description(doc.getDescription())
+                .category(doc.getCategory())
+                .price(doc.getPrice())
+                .imageUrl(doc.getImageUrl())
+                .stockQuantity(doc.getStockQuantity())
+                .rating(doc.getRating())
+                .reviewCount(doc.getReviewCount())
+                .build();
     }
 }
